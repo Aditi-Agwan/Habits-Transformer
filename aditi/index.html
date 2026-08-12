@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Project 100 — 30-Day Level-Up Tracker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<style>
+/* ============================================================
+   PROJECT 100 — visual direction: "the court"
+   Palette pulled off a badminton court: pine surface, chalk
+   lines, two jersey colours facing each other across a net.
+   ============================================================ */
+:root{
+  --court:      #0E2620;
+  --court-hi:   #143329;
+  --panel:      #16382E;
+  --panel-2:    #1B4438;
+  --chalk:      #F1F5EC;
+  --chalk-mid:  #9DB3A6;
+  --chalk-dim:  #6C877A;
+  --line:       rgba(241,245,236,.14);
+  --line-soft:  rgba(241,245,236,.07);
+  --pa:         #FF7A4D;   /* player A — clay */
+  --pb:         #4FC3E8;   /* player B — pool */
+  --gold:       #E8C15A;
+  --bad:        #FF6B5C;
+
+  --mono: ui-monospace, "SF Mono", "Menlo", "Consolas", "Roboto Mono", monospace;
+  --cond: "Arial Narrow", "Helvetica Neue Condensed", "Roboto Condensed", system-ui, sans-serif;
+  --body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+
+  --r: 4px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--court);
+  color:var(--chalk);
+  font-family:var(--body);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  background-image:
+    linear-gradient(0deg, rgba(0,0,0,.25), rgba(0,0,0,0) 40%),
+    repeating-linear-gradient(90deg, var(--line-soft) 0 1px, transparent 1px 92px);
+  background-attachment:fixed;
+  min-height:100vh;
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer;background:none;border:none;padding:0}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:2px}
+
+/* ---------- type roles ---------- */
+.eyebrow{
+  font-family:var(--cond);
+  font-size:11px;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--chalk-dim);
+  font-weight:700;
+}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+
+/* ---------- shell ---------- */
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px 72px}
+
+.topbar{
+  position:sticky;top:0;z-index:30;
+  background:rgba(14,38,32,.93);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.topbar-in{max-width:1120px;margin:0 auto;padding:14px 20px 0;display:flex;flex-wrap:wrap;gap:14px;align-items:baseline}
+.brand{font-family:var(--cond);font-weight:700;font-size:20px;letter-spacing:.16em;text-transform:uppercase;margin:0}
+.brand span{color:var(--gold)}
+.daychip{
+  font-family:var(--mono);font-size:12px;color:var(--chalk-mid);
+  border:1px solid var(--line);border-radius:99px;padding:3px 10px;
+}
+.who{margin-left:auto;display:flex;align-items:center;gap:8px}
+.who-label{font-family:var(--cond);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--chalk-dim)}
+.pill{
+  border:1px solid var(--line);border-radius:99px;padding:5px 13px;
+  font-family:var(--cond);font-size:13px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--chalk-mid);transition:.15s;
+}
+.pill:hover{color:var(--chalk);border-color:var(--chalk-dim)}
+.pill.on-a{background:var(--pa);border-color:var(--pa);color:#2A0E04;font-weight:700}
+.pill.on-b{background:var(--pb);border-color:var(--pb);color:#04222B;font-weight:700}
+
+.tabs{max-width:1120px;margin:0 auto;padding:10px 20px 0;display:flex;gap:2px;overflow-x:auto}
+.tab{
+  font-family:var(--cond);font-size:13px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--chalk-dim);padding:9px 15px;border-bottom:2px solid transparent;white-space:nowrap;
+}
+.tab:hover{color:var(--chalk)}
+.tab.on{color:var(--chalk);border-bottom-color:var(--gold)}
+
+/* ---------- cards ---------- */
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  padding:20px;
+}
+.card + .card{margin-top:16px}
+.card-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px}
+.card-head h2{font-family:var(--cond);font-size:15px;letter-spacing:.2em;text-transform:uppercase;margin:0;font-weight:700}
+.card-note{font-size:12px;color:var(--chalk-dim);margin-left:auto;text-align:right}
+
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media(max-width:860px){.grid2{grid-template-columns:1fr}}
+
+/* ---------- date strip ---------- */
+.datestrip{
+  display:flex;align-items:center;gap:14px;
+  padding:18px 0 20px;border-bottom:1px solid var(--line);margin-bottom:20px;flex-wrap:wrap;
+}
+.arrow{
+  width:34px;height:34px;border:1px solid var(--line);border-radius:var(--r);
+  color:var(--chalk-mid);font-size:15px;display:grid;place-items:center;
+}
+.arrow:hover:not(:disabled){border-color:var(--chalk);color:var(--chalk)}
+.arrow:disabled{opacity:.28;cursor:not-allowed}
+.datestrip .dt{font-family:var(--cond);font-size:26px;letter-spacing:.05em;text-transform:uppercase}
+.datestrip .dt small{display:block;font-size:11px;letter-spacing:.2em;color:var(--chalk-dim)}
+.today-btn{font-family:var(--cond);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid rgba(232,193,90,.4)}
+.strip-score{margin-left:auto;text-align:right}
+.strip-score .big{font-family:var(--mono);font-size:44px;font-weight:700;line-height:1}
+.strip-score .of{color:var(--chalk-dim);font-size:20px}
+
+/* ---------- log form ---------- */
+.cat{border-top:1px solid var(--line-soft);padding:16px 0}
+.cat:first-of-type{border-top:none;padding-top:0}
+.cat-top{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.cat-name{font-family:var(--cond);font-size:14px;letter-spacing:.16em;text-transform:uppercase;font-weight:700}
+.cat-pts{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--chalk-mid)}
+.cat-pts b{color:var(--chalk);font-weight:700}
+.wt-flag{
+  font-family:var(--mono);font-size:10px;padding:1px 6px;border-radius:99px;
+  border:1px solid rgba(232,193,90,.45);color:var(--gold);
+}
+
+.check{
+  display:flex;align-items:center;gap:10px;padding:7px 0;cursor:pointer;
+  font-size:14px;color:var(--chalk-mid);
+}
+.check:hover{color:var(--chalk)}
+.check input{position:absolute;opacity:0;width:0;height:0}
+.box{
+  width:19px;height:19px;flex:none;border:1.5px solid var(--chalk-dim);border-radius:3px;
+  display:grid;place-items:center;transition:.12s;
+}
+.check input:checked ~ .box{background:var(--gold);border-color:var(--gold)}
+.box svg{opacity:0;width:11px;height:11px}
+.check input:checked ~ .box svg{opacity:1}
+.check .val{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--chalk-dim)}
+.check input:checked ~ .val{color:var(--gold)}
+.check input:focus-visible ~ .box{outline:2px solid var(--gold);outline-offset:2px}
+
+.tiers{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.tier{
+  border:1px solid var(--line);border-radius:var(--r);padding:7px 11px;
+  font-size:12.5px;color:var(--chalk-mid);line-height:1.2;text-align:center;
+}
+.tier b{display:block;font-family:var(--mono);font-size:13px;color:var(--chalk-dim)}
+.tier:hover{border-color:var(--chalk-dim);color:var(--chalk)}
+.tier.on{background:var(--panel-2);border-color:var(--gold);color:var(--chalk)}
+.tier.on b{color:var(--gold)}
+
+.slider-row{display:grid;grid-template-columns:132px 1fr 42px;gap:12px;align-items:center;padding:6px 0}
+.slider-row label{font-size:13.5px;color:var(--chalk-mid)}
+.slider-row .v{font-family:var(--mono);font-size:13px;text-align:right;color:var(--chalk)}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:3px;border-radius:2px;
+  background:rgba(241,245,236,.16);outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;
+  background:var(--chalk);border:none;cursor:pointer;
+}
+input[type=range]::-moz-range-thumb{
+  width:15px;height:15px;border-radius:50%;background:var(--chalk);border:none;cursor:pointer;
+}
+input[type=range].pa::-webkit-slider-thumb{background:var(--pa)}
+input[type=range].pa::-moz-range-thumb{background:var(--pa)}
+input[type=range].pb::-webkit-slider-thumb{background:var(--pb)}
+input[type=range].pb::-moz-range-thumb{background:var(--pb)}
+
+.txt{
+  width:100%;background:var(--court-hi);border:1px solid var(--line);border-radius:var(--r);
+  padding:9px 11px;font-size:14px;color:var(--chalk);
+}
+.txt::placeholder{color:var(--chalk-dim)}
+.txt:focus{border-color:var(--chalk-dim);outline:none}
+textarea.txt{resize:vertical;font-family:var(--mono);font-size:12px;line-height:1.55}
+
+/* ---------- THE COURT (signature head-to-head) ---------- */
+.court{position:relative;padding:6px 0}
+.net{
+  position:absolute;left:50%;top:0;bottom:26px;width:3px;transform:translateX(-50%);
+  background:repeating-linear-gradient(180deg, var(--chalk) 0 2px, transparent 2px 6px);
+  opacity:.5;
+}
+.net::before,.net::after{
+  content:"";position:absolute;left:-3px;width:9px;height:9px;background:var(--chalk);opacity:.7;
+}
+.net::before{top:-4px}
+.net::after{bottom:-4px}
+.rally{display:grid;grid-template-columns:1fr 104px 1fr;align-items:center;gap:0;padding:9px 0}
+.side{display:flex;align-items:center;gap:8px}
+.side.l{justify-content:flex-end}
+.side.r{flex-direction:row-reverse;justify-content:flex-end}
+.track{flex:1;height:19px;background:rgba(0,0,0,.22);border-radius:2px;display:flex;overflow:hidden}
+.side.l .track{justify-content:flex-end}
+.fill{height:100%;transition:width .45s cubic-bezier(.2,.8,.25,1);min-width:2px}
+.fill.a{background:var(--pa)}
+.fill.b{background:var(--pb)}
+.sc{font-family:var(--mono);font-size:14px;width:34px;flex:none}
+.side.l .sc{text-align:left;color:var(--pa)}
+.side.r .sc{text-align:right;color:var(--pb)}
+.mid{text-align:center;padding:0 8px}
+.mid .n{font-family:var(--cond);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--chalk-mid);display:block}
+.mid .cap{font-family:var(--mono);font-size:10px;color:var(--chalk-dim)}
+.baseline{
+  display:grid;grid-template-columns:1fr 104px 1fr;padding-top:12px;margin-top:6px;
+  border-top:1px solid var(--line);
+}
+.baseline .who-l{text-align:right}
+.baseline .who-r{text-align:left}
+.baseline .nm{font-family:var(--cond);font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+.baseline .tot{font-family:var(--mono);font-size:30px;font-weight:700;line-height:1.15}
+.a-tx{color:var(--pa)}
+.b-tx{color:var(--pb)}
+.verdict{
+  text-align:center;font-family:var(--cond);font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--chalk-dim);align-self:center;
+}
+
+/* ---------- week ---------- */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft)}
+.stat{background:var(--panel);padding:12px 13px}
+.stat .k{font-family:var(--cond);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--chalk-dim)}
+.stat .v{font-family:var(--mono);font-size:21px;font-weight:700;margin-top:3px}
+.stat .v small{font-size:12px;color:var(--chalk-dim);font-weight:400}
+
+.chart{display:flex;align-items:flex-end;gap:6px;height:170px;padding-top:8px;border-bottom:1px solid var(--line)}
+.daycol{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:4px;height:100%}
+.pair{display:flex;align-items:flex-end;justify-content:center;gap:3px;height:100%}
+.bar{width:13px;border-radius:2px 2px 0 0;transition:height .45s cubic-bezier(.2,.8,.25,1);min-height:2px}
+.bar.a{background:var(--pa)}
+.bar.b{background:var(--pb)}
+.bar.ghost{background:rgba(241,245,236,.09)}
+.xaxis{display:flex;gap:6px;padding-top:7px}
+.xlab{flex:1;text-align:center;font-family:var(--cond);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--chalk-dim)}
+.xlab.now{color:var(--gold)}
+
+.wt-row{display:grid;grid-template-columns:120px 1fr 118px;gap:12px;align-items:center;padding:8px 0;border-top:1px solid var(--line-soft)}
+.wt-row:first-of-type{border-top:none}
+.wt-name{font-family:var(--cond);font-size:13px;letter-spacing:.13em;text-transform:uppercase}
+.meter{height:6px;background:rgba(0,0,0,.25);border-radius:3px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--chalk-dim);transition:width .4s}
+.meter i.weak{background:var(--bad)}
+.meter i.strong{background:var(--gold)}
+.stepper{display:flex;align-items:center;justify-content:flex-end;gap:8px}
+.step{width:26px;height:26px;border:1px solid var(--line);border-radius:var(--r);color:var(--chalk-mid);display:grid;place-items:center;font-family:var(--mono)}
+.step:hover:not(:disabled){border-color:var(--chalk);color:var(--chalk)}
+.step:disabled{opacity:.25;cursor:not-allowed}
+.stepper .n{font-family:var(--mono);font-size:16px;width:26px;text-align:center}
+
+.budget{
+  display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);
+  flex-wrap:wrap;
+}
+.btn{
+  border:1px solid var(--line);border-radius:var(--r);padding:9px 15px;
+  font-family:var(--cond);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--chalk-mid);
+}
+.btn:hover:not(:disabled){border-color:var(--chalk);color:var(--chalk)}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#2C2205;font-weight:700}
+.btn.gold:hover{opacity:.9;color:#2C2205}
+.btn.danger{border-color:rgba(255,107,92,.4);color:var(--bad)}
+.btn.danger:hover{border-color:var(--bad);color:var(--bad)}
+
+/* ---------- 30 day grid ---------- */
+.dgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
+@media(max-width:720px){.dgrid{grid-template-columns:repeat(6,1fr)}}
+.dcell{
+  background:var(--court-hi);border:1px solid var(--line-soft);border-radius:3px;
+  padding:6px 5px 5px;display:flex;flex-direction:column;gap:5px;
+}
+.dcell.today{border-color:var(--gold)}
+.dcell .dn{font-family:var(--mono);font-size:10px;color:var(--chalk-dim);text-align:center}
+.dbars{display:flex;align-items:flex-end;justify-content:center;gap:2px;height:34px}
+.dbar{width:7px;border-radius:1px;background:rgba(241,245,236,.08);min-height:2px}
+.dbar.a{background:var(--pa)}
+.dbar.b{background:var(--pb)}
+
+.lvl{padding:14px 0;border-top:1px solid var(--line-soft)}
+.lvl:first-of-type{border-top:none;padding-top:0}
+.lvl-top{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
+.lvl-name{font-family:var(--cond);font-size:14px;letter-spacing:.14em;text-transform:uppercase}
+.lvl-tier{font-size:13px;color:var(--chalk-mid);margin-left:auto}
+.lvl-pts{font-family:var(--mono);font-size:18px;font-weight:700}
+.lvl-bar{height:8px;background:rgba(0,0,0,.25);border-radius:4px;overflow:hidden}
+.lvl-bar i{display:block;height:100%;transition:width .5s}
+.lvl-next{font-size:11.5px;color:var(--chalk-dim);margin-top:6px}
+
+/* ---------- setup ---------- */
+.field{margin-bottom:14px}
+.field .eyebrow{display:block;margin-bottom:6px}
+.rule{border:none;border-top:1px solid var(--line);margin:20px 0}
+.saveflag{
+  position:fixed;right:18px;bottom:18px;z-index:40;
+  font-family:var(--cond);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  background:var(--panel-2);border:1px solid var(--line);border-radius:99px;padding:7px 14px;
+  color:var(--chalk-mid);opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.saveflag.show{opacity:1}
+.empty{color:var(--chalk-dim);font-size:14px;padding:22px 0;text-align:center}
+.golden{
+  border-left:2px solid var(--gold);padding:10px 0 10px 14px;margin-top:18px;
+  font-size:13.5px;color:var(--chalk-mid);
+}
+.golden b{color:var(--chalk)}
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important;animation:none !important}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef,useMemo,useCallback} = React;
+
+/* ============================================================
+   Scoring model — straight from the challenge doc
+   ============================================================ */
+const CATS = [
+  {key:'wakeup',   label:'Wakeup',   icon:'🌅', base:10},
+  {key:'workout',  label:'Workout',  icon:'💪', base:25},
+  {key:'work',     label:'Work',     icon:'💼', base:25},
+  {key:'personal', label:'Personal', icon:'🌱', base:25},
+  {key:'sleep',    label:'Sleep',    icon:'😴', base:15},
+];
+const BASE_W = {wakeup:10,workout:25,work:25,personal:25,sleep:15};
+const TIERS = [
+  {v:0,  t:'Rest day'},
+  {v:8,  t:'10–20 min'},
+  {v:12, t:'20–30 min'},
+  {v:17, t:'30–45 min'},
+  {v:20, t:'45–60 min'},
+  {v:22, t:'60+ min'},
+];
+const LEVELS = [
+  {min:0,    name:'Getting Started', icon:'🌱'},
+  {min:501,  name:'Building',        icon:'🌿'},
+  {min:1001, name:'Consistent',      icon:'💪'},
+  {min:1501, name:'Strong',          icon:'🔥'},
+  {min:2001, name:'Disciplined',     icon:'🏆'},
+  {min:2501, name:'Level Up',        icon:'👑'},
+];
+
+const emptyEntry = () => ({
+  wakeup:{onTime:false,noSnooze:false,noScroll:false},
+  workout:{tier:0,extra:false,activity:''},
+  work:{focus:0,discipline:0,learning:0},
+  personal:{reading:0,phone:0,water:0,food:0,hobby:0},
+  sleep:{bed:false,enough:false,phoneAway:false,prep:false},
+  note:''
+});
+
+function rawScores(e){
+  if(!e) return {wakeup:0,workout:0,work:0,personal:0,sleep:0};
+  const w=e.wakeup||{}, wo=e.workout||{}, wk=e.work||{}, p=e.personal||{}, s=e.sleep||{};
+  return {
+    wakeup:(w.onTime?7:0)+(w.noSnooze?2:0)+(w.noScroll?1:0),
+    workout:Math.min(25,(wo.tier||0)+((wo.tier||0)>0&&wo.extra?3:0)),
+    work:(wk.focus||0)+(wk.discipline||0)+(wk.learning||0),
+    personal:(p.reading||0)+(p.phone||0)+(p.water||0)+(p.food||0)+(p.hobby||0),
+    sleep:(s.bed?7:0)+(s.enough?5:0)+(s.phoneAway?2:0)+(s.prep?1:0),
+  };
+}
+/* Sub-scores are always logged against the fixed rubric, then scaled by the
+   week's weights. That keeps the rubric stable while rebalancing changes value. */
+function score(e, weights){
+  const raw = rawScores(e);
+  const weighted = {}; let total = 0;
+  for(const c of CATS){
+    const v = Math.round(raw[c.key] / c.base * (weights[c.key] ?? c.base));
+    weighted[c.key] = v; total += v;
+  }
+  return {raw, weighted, total, logged: !!e};
+}
+const levelFor = pts => [...LEVELS].reverse().find(l => pts >= l.min) || LEVELS[0];
+
+/* ============================================================
+   Dates
+   ============================================================ */
+const pad = n => String(n).padStart(2,'0');
+const toKey = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const fromKey = k => { const [y,m,d]=k.split('-').map(Number); return new Date(y,m-1,d); };
+const addDays = (k,n) => { const d=fromKey(k); d.setDate(d.getDate()+n); return toKey(d); };
+const diffDays = (a,b) => Math.round((fromKey(a)-fromKey(b))/86400000);
+const TODAY = toKey(new Date());
+const DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const pretty = k => { const d=fromKey(k); return `${DOW[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}`; };
+const weekOf = (k,start) => Math.floor(Math.max(0,diffDays(k,start))/7)+1;
+const weekDates = (w,start) => Array.from({length:7},(_,i)=>addDays(start,(w-1)*7+i));
+
+/* ============================================================
+   Storage — window.storage inside Claude, localStorage standalone
+   ============================================================ */
+const KEY='project100:state', ME='project100:me';
+const hasClaude = typeof window!=='undefined' && window.storage && typeof window.storage.get==='function';
+const store = {
+  async get(k, shared){
+    if(hasClaude){ try{ const r=await window.storage.get(k,shared); return r? JSON.parse(r.value):null; }catch(e){ return null; } }
+    try{ const v=localStorage.getItem(k); return v? JSON.parse(v):null; }catch(e){ return null; }
+  },
+  async set(k, val, shared){
+    if(hasClaude){ try{ await window.storage.set(k, JSON.stringify(val), shared); }catch(e){} return; }
+    try{ localStorage.setItem(k, JSON.stringify(val)); }catch(e){}
+  }
+};
+const freshState = () => ({
+  v:1,
+  names:{a:'Player A', b:'Player B'},
+  start:TODAY,
+  weights:{},                 // {weekNumber: {cat: pts}}
+  entries:{a:{}, b:{}}
+});
+const weightsFor = (st,w) => ({...BASE_W, ...(st.weights[w]||{})});
+
+/* ============================================================
+   Small pieces
+   ============================================================ */
+const Tick = () => (
+  <svg viewBox="0 0 12 12" fill="none" stroke="#2C2205" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1.5 6.4 4.4 9.3 10.5 2.8"/>
+  </svg>
+);
+function Check({label, pts, on, set}){
+  return (
+    <label className="check">
+      <input type="checkbox" checked={!!on} onChange={e=>set(e.target.checked)} />
+      <span className="box"><Tick/></span>
+      <span>{label}</span>
+      <span className="val">+{pts}</span>
+    </label>
+  );
+}
+function Slide({label, max, val, set, tone}){
+  return (
+    <div className="slider-row">
+      <label htmlFor={'s-'+label}>{label}</label>
+      <input id={'s-'+label} className={tone} type="range" min="0" max={max} value={val||0}
+             onChange={e=>set(+e.target.value)} aria-label={label}/>
+      <span className="v">{val||0}<span style={{color:'var(--chalk-dim)'}}>/{max}</span></span>
+    </div>
+  );
+}
+function Card({title, note, children, style}){
+  return (
+    <section className="card" style={style}>
+      {(title||note) && (
+        <div className="card-head">
+          {title && <h2>{title}</h2>}
+          {note && <div className="card-note">{note}</div>}
+        </div>
+      )}
+      {children}
+    </section>
+  );
+}
+
+/* ============================================================
+   Log form
+   ============================================================ */
+function LogForm({entry, weights, tone, onChange}){
+  const e = entry || emptyEntry();
+  const s = score(entry, weights);
+  const set = (cat, patch) => onChange({...e, [cat]:{...e[cat], ...patch}});
+
+  const Head = ({c}) => {
+    const w = weights[c.key] ?? c.base;
+    return (
+      <div className="cat-top">
+        <span aria-hidden="true">{c.icon}</span>
+        <span className="cat-name">{c.label}</span>
+        {w !== c.base && <span className="wt-flag">{w>c.base?'▲':'▼'} {w}</span>}
+        <span className="cat-pts"><b>{s.weighted[c.key]}</b>/{w}</span>
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      <div className="cat">
+        <Head c={CATS[0]}/>
+        <Check label="Woke up around my target time" pts="7" on={e.wakeup.onTime} set={v=>set('wakeup',{onTime:v})}/>
+        <Check label="Got out of bed without snoozing" pts="2" on={e.wakeup.noSnooze} set={v=>set('wakeup',{noSnooze:v})}/>
+        <Check label="Didn't reach for the phone first" pts="1" on={e.wakeup.noScroll} set={v=>set('wakeup',{noScroll:v})}/>
+      </div>
+
+      <div className="cat">
+        <Head c={CATS[1]}/>
+        <div className="tiers">
+          {TIERS.map(t=>(
+            <button key={t.v} className={'tier'+(e.workout.tier===t.v?' on':'')}
+                    onClick={()=>set('workout',{tier:t.v})}>
+              {t.t}<b>{t.v?'+'+t.v:'0'}</b>
+            </button>
+          ))}
+        </div>
+        <Check label="Pushed harder than usual" pts="3" on={e.workout.extra} set={v=>set('workout',{extra:v})}/>
+        <input className="txt" style={{marginTop:8}} placeholder="What did you do? (run, gym, badminton…)"
+               value={e.workout.activity||''} onChange={ev=>set('workout',{activity:ev.target.value})}/>
+      </div>
+
+      <div className="cat">
+        <Head c={CATS[2]}/>
+        <Slide label="Focus" max={10} val={e.work.focus} set={v=>set('work',{focus:v})} tone={tone}/>
+        <Slide label="Work discipline" max={5} val={e.work.discipline} set={v=>set('work',{discipline:v})} tone={tone}/>
+        <Slide label="Learning" max={10} val={e.work.learning} set={v=>set('work',{learning:v})} tone={tone}/>
+      </div>
+
+      <div className="cat">
+        <Head c={CATS[3]}/>
+        <Slide label="Reading" max={5} val={e.personal.reading} set={v=>set('personal',{reading:v})} tone={tone}/>
+        <Slide label="Phone discipline" max={5} val={e.personal.phone} set={v=>set('personal',{phone:v})} tone={tone}/>
+        <Slide label="Water" max={5} val={e.personal.water} set={v=>set('personal',{water:v})} tone={tone}/>
+        <Slide label="Food" max={5} val={e.personal.food} set={v=>set('personal',{food:v})} tone={tone}/>
+        <Slide label="Hobby / meditation" max={5} val={e.personal.hobby} set={v=>set('personal',{hobby:v})} tone={tone}/>
+      </div>
+
+      <div className="cat">
+        <Head c={CATS[4]}/>
+        <Check label="Got into bed around my target time" pts="7" on={e.sleep.bed} set={v=>set('sleep',{bed:v})}/>
+        <Check label="Slept enough hours" pts="5" on={e.sleep.enough} set={v=>set('sleep',{enough:v})}/>
+        <Check label="Phone away before bed" pts="2" on={e.sleep.phoneAway} set={v=>set('sleep',{phoneAway:v})}/>
+        <Check label="Set tomorrow up before sleeping" pts="1" on={e.sleep.prep} set={v=>set('sleep',{prep:v})}/>
+      </div>
+
+      <div className="cat">
+        <span className="eyebrow" style={{display:'block',marginBottom:6}}>Note to self</span>
+        <input className="txt" placeholder="One honest line about today"
+               value={e.note||''} onChange={ev=>onChange({...e, note:ev.target.value})}/>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   The court — head-to-head for a single day
+   ============================================================ */
+function Court({names, sA, sB, weights, subtitle}){
+  const win = sA.total===sB.total ? 'Level' : (sA.total>sB.total ? names.a : names.b);
+  return (
+    <div className="court">
+      <div className="net" aria-hidden="true"></div>
+      {CATS.map(c=>{
+        const w = weights[c.key] ?? c.base;
+        const a = sA.weighted[c.key], b = sB.weighted[c.key];
+        return (
+          <div className="rally" key={c.key}>
+            <div className="side l">
+              <span className="sc">{a}</span>
+              <div className="track"><div className="fill a" style={{width:(a/w*100)+'%'}}/></div>
+            </div>
+            <div className="mid">
+              <span className="n">{c.label}</span>
+              <span className="cap">{w} pts{w!==c.base?' ▲':''}</span>
+            </div>
+            <div className="side r">
+              <span className="sc">{b}</span>
+              <div className="track"><div className="fill b" style={{width:(b/w*100)+'%'}}/></div>
+            </div>
+          </div>
+        );
+      })}
+      <div className="baseline">
+        <div className="who-l">
+          <div className="nm a-tx">{names.a}</div>
+          <div className="tot a-tx">{sA.total}</div>
+        </div>
+        <div className="verdict">{subtitle || (win==='Level' ? 'Dead level' : win + ' ahead')}</div>
+        <div className="who-r">
+          <div className="nm b-tx">{names.b}</div>
+          <div className="tot b-tx">{sB.total}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   Week maths
+   ============================================================ */
+function weekStats(entries, dates, weights){
+  let total=0,best=0,bestDay=null,logged=0,workout=0,learning=0,sleep=0;
+  const perDay=[], catTotals={};
+  CATS.forEach(c=>catTotals[c.key]=0);
+  dates.forEach(k=>{
+    const e = entries[k];
+    const s = score(e, weights);
+    perDay.push({date:k, ...s});
+    if(!e) return;
+    logged++; total += s.total;
+    if(s.total>best){best=s.total; bestDay=k;}
+    CATS.forEach(c=>catTotals[c.key]+=s.weighted[c.key]);
+    if(s.raw.workout>0) workout++;
+    if((e.work&&e.work.learning||0)>0) learning++;
+    if(s.raw.sleep>=12) sleep++;
+  });
+  return {total,best,bestDay,logged,workout,learning,sleep,perDay,catTotals,
+          avg: logged? Math.round(total/logged) : 0};
+}
+function streakFor(entries){
+  let n=0, k=TODAY;
+  if(!entries[k]) k = addDays(TODAY,-1);           // today not logged yet is fine
+  while(entries[k] && score(entries[k],BASE_W).total>0){ n++; k=addDays(k,-1); }
+  return n;
+}
+const cumulative = entries => Object.keys(entries)
+  .reduce((sum,k)=>sum + score(entries[k],BASE_W).total, 0);
+
+/* ============================================================
+   Views
+   ============================================================ */
+function DayView({st, me, cursor, setCursor, update}){
+  const wk = weekOf(cursor, st.start);
+  const W  = weightsFor(st, wk);
+  const eA = st.entries.a[cursor], eB = st.entries.b[cursor];
+  const sA = score(eA, W), sB = score(eB, W);
+  const mine = me==='a'? sA : sB;
+  const dayNo = diffDays(cursor, st.start)+1;
+
+  return (
+    <div>
+      <div className="datestrip">
+        <button className="arrow" onClick={()=>setCursor(addDays(cursor,-1))} aria-label="Previous day">‹</button>
+        <button className="arrow" onClick={()=>setCursor(addDays(cursor,1))}
+                disabled={cursor>=TODAY} aria-label="Next day">›</button>
+        <div className="dt">
+          {cursor===TODAY ? 'Today' : pretty(cursor)}
+          <small>{cursor===TODAY ? pretty(cursor) : ''} {dayNo>=1&&dayNo<=30 ? `· Day ${dayNo} of 30` : ''}</small>
+        </div>
+        {cursor!==TODAY && <button className="today-btn" onClick={()=>setCursor(TODAY)}>Back to today</button>}
+        <div className="strip-score">
+          <span className="eyebrow">Your score</span>
+          <div><span className="big" style={{color: me==='a'?'var(--pa)':'var(--pb)'}}>{mine.total}</span><span className="of num"> /100</span></div>
+        </div>
+      </div>
+
+      <div className="grid2">
+        <Card title={`${st.names[me]} — log the day`} note={<span>Week {wk} weights<br/>Scores save as you type</span>}>
+          <LogForm entry={me==='a'?eA:eB} weights={W} tone={me==='a'?'pa':'pb'}
+                   onChange={v=>update(me, cursor, v)} />
+        </Card>
+
+        <div>
+          <Card title="Head to head" note={pretty(cursor)}>
+            {(!eA && !eB)
+              ? <div className="empty">Nothing logged for this day yet. Fill in the left panel to put a score on the board.</div>
+              : <Court names={st.names} sA={sA} sB={sB} weights={W}/>}
+          </Card>
+
+          <Card title="Where the points went">
+            {[['a',sA,eA],['b',sB,eB]].map(([p,s,e])=>(
+              <div key={p} style={{padding:'10px 0',borderTop:p==='b'?'1px solid var(--line-soft)':'none'}}>
+                <div style={{display:'flex',alignItems:'baseline',gap:10}}>
+                  <span className={p==='a'?'a-tx':'b-tx'}
+                        style={{fontFamily:'var(--cond)',letterSpacing:'.14em',textTransform:'uppercase',fontSize:13}}>{st.names[p]}</span>
+                  <span className="num" style={{marginLeft:'auto',fontSize:15}}>{s.total}<span style={{color:'var(--chalk-dim)'}}>/100</span></span>
+                </div>
+                {!e
+                  ? <div style={{fontSize:13,color:'var(--chalk-dim)',marginTop:4}}>Not logged.</div>
+                  : <>
+                      <div style={{display:'flex',gap:3,marginTop:8,height:8}}>
+                        {CATS.map(c=>(
+                          <div key={c.key} title={`${c.label} ${s.weighted[c.key]}/${W[c.key]}`}
+                               style={{flex:W[c.key],background:'rgba(0,0,0,.25)',borderRadius:2,overflow:'hidden'}}>
+                            <div style={{height:'100%',width:(s.weighted[c.key]/W[c.key]*100)+'%',
+                                         background:p==='a'?'var(--pa)':'var(--pb)'}}/>
+                          </div>
+                        ))}
+                      </div>
+                      {e.workout && e.workout.activity &&
+                        <div style={{fontSize:13,color:'var(--chalk-mid)',marginTop:8}}>💪 {e.workout.activity}</div>}
+                      {e.note && <div style={{fontSize:13,color:'var(--chalk-mid)',marginTop:4,fontStyle:'italic'}}>“{e.note}”</div>}
+                    </>}
+              </div>
+            ))}
+            <div className="golden">
+              <b>Never let one bad day become a bad week.</b> A 32 you wrote honestly is worth more than a 72 you talked yourself into.
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WeekView({st, setSt, me}){
+  const curWeek = Math.min(5, Math.max(1, weekOf(TODAY, st.start)));
+  const [wk, setWk] = useState(curWeek);
+  const W = weightsFor(st, wk);
+  const dates = weekDates(wk, st.start);
+  const A = weekStats(st.entries.a, dates, W);
+  const B = weekStats(st.entries.b, dates, W);
+  const nextWeek = wk+1;
+  const [draft, setDraft] = useState(null);
+  const D = draft || weightsFor(st, nextWeek);
+  const spent = CATS.reduce((s,c)=>s+D[c.key],0);
+
+  const myStats = me==='a'?A:B;
+  const weakest = CATS.reduce((w,c)=>{
+    const pct = myStats.logged ? myStats.catTotals[c.key]/(W[c.key]*myStats.logged) : 1;
+    return pct < w.pct ? {key:c.key,label:c.label,pct} : w;
+  }, {key:null,label:'',pct:2});
+
+  const suggest = () => {
+    const pcts = CATS.map(c=>({key:c.key, pct: myStats.logged? myStats.catTotals[c.key]/(W[c.key]*myStats.logged) : 1}))
+                     .sort((x,y)=>x.pct-y.pct);
+    const n = {...BASE_W};
+    n[pcts[0].key] += 10;
+    n[pcts[pcts.length-1].key] -= 5;
+    n[pcts[pcts.length-2].key] -= 5;
+    setDraft(n);
+  };
+  const applyWeights = () => {
+    setSt(s=>({...s, weights:{...s.weights, [nextWeek]:{...D}}}));
+    setDraft(null);
+  };
+
+  const Scoreboard = ({name, s, tone}) => (
+    <Card title={name} note={`${s.logged}/7 days logged`}>
+      <div style={{display:'flex',alignItems:'baseline',gap:12,marginBottom:14}}>
+        <span className="num" style={{fontSize:46,fontWeight:700,lineHeight:1,color:tone}}>{s.total}</span>
+        <span className="num" style={{fontSize:20,color:'var(--chalk-dim)'}}>/700</span>
+        <span className="eyebrow" style={{marginLeft:'auto'}}>Avg {s.avg}/100</span>
+      </div>
+      <div className="stats">
+        <div className="stat"><div className="k">Best day</div><div className="v">{s.best}<small>/100</small></div></div>
+        <div className="stat"><div className="k">Workout days</div><div className="v">{s.workout}<small>/7</small></div></div>
+        <div className="stat"><div className="k">Learning days</div><div className="v">{s.learning}<small>/7</small></div></div>
+        <div className="stat"><div className="k">Good sleep</div><div className="v">{s.sleep}<small>/7</small></div></div>
+        <div className="stat"><div className="k">Streak</div><div className="v">{s.streak}<small>days</small></div></div>
+        <div className="stat"><div className="k">Days logged</div><div className="v">{s.logged}<small>/7</small></div></div>
+      </div>
+    </Card>
+  );
+  A.streak = streakFor(st.entries.a);
+  B.streak = streakFor(st.entries.b);
+
+  const maxBar = 100;
+  return (
+    <div>
+      <div className="datestrip">
+        <button className="arrow" onClick={()=>{setWk(w=>Math.max(1,w-1));setDraft(null);}} disabled={wk<=1} aria-label="Previous week">‹</button>
+        <button className="arrow" onClick={()=>{setWk(w=>Math.min(5,w+1));setDraft(null);}} disabled={wk>=5} aria-label="Next week">›</button>
+        <div className="dt">Week {wk}<small>{pretty(dates[0])} — {pretty(dates[6])}</small></div>
+        <div className="strip-score">
+          <span className="eyebrow">Weekly gap</span>
+          <div>
+            <span className="big" style={{color: A.total===B.total?'var(--chalk)':(A.total>B.total?'var(--pa)':'var(--pb)')}}>
+              {A.total===B.total ? '—' : Math.abs(A.total-B.total)}
+            </span>
+            <span className="of num"> pts</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid2">
+        <Scoreboard name={st.names.a} s={A} tone="var(--pa)"/>
+        <Scoreboard name={st.names.b} s={B} tone="var(--pb)"/>
+      </div>
+
+      <Card title="Day by day" note="Both scores, side by side">
+        <div className="chart">
+          {dates.map(k=>{
+            const a=score(st.entries.a[k],W).total, b=score(st.entries.b[k],W).total;
+            return (
+              <div className="daycol" key={k}>
+                <div className="pair">
+                  <div className={'bar '+(st.entries.a[k]?'a':'ghost')} style={{height:Math.max(2,a/maxBar*100)+'%'}} title={`${st.names.a}: ${a}`}/>
+                  <div className={'bar '+(st.entries.b[k]?'b':'ghost')} style={{height:Math.max(2,b/maxBar*100)+'%'}} title={`${st.names.b}: ${b}`}/>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="xaxis">
+          {dates.map(k=>(
+            <span key={k} className={'xlab'+(k===TODAY?' now':'')}>{DOW[fromKey(k).getDay()]}<br/>{fromKey(k).getDate()}</span>
+          ))}
+        </div>
+      </Card>
+
+      <Card title="Sunday rebalance"
+            note={<span>Reweight week {nextWeek}<br/>Total must stay at 100</span>}>
+        <p style={{marginTop:0,color:'var(--chalk-mid)',fontSize:14}}>
+          Your weakest area in week {wk} was <b style={{color:'var(--bad)'}}>{weakest.label}</b> at {Math.round(weakest.pct*100)}% of its points.
+          Make it worth more next week and the game pushes you straight at it.
+        </p>
+        {CATS.map(c=>{
+          const pct = myStats.logged ? myStats.catTotals[c.key]/(W[c.key]*myStats.logged) : 0;
+          const isWeak = c.key===weakest.key;
+          return (
+            <div className="wt-row" key={c.key}>
+              <div className="wt-name">{c.icon} {c.label}</div>
+              <div>
+                <div className="meter"><i className={isWeak?'weak':(pct>=.8?'strong':'')} style={{width:Math.round(pct*100)+'%'}}/></div>
+                <div style={{fontSize:11,color:'var(--chalk-dim)',marginTop:4,fontFamily:'var(--mono)'}}>
+                  week {wk}: {Math.round(pct*100)}% earned
+                </div>
+              </div>
+              <div className="stepper">
+                <button className="step" onClick={()=>setDraft({...D,[c.key]:Math.max(0,D[c.key]-5)})} disabled={D[c.key]<=0} aria-label={'Lower '+c.label}>−</button>
+                <span className="n">{D[c.key]}</span>
+                <button className="step" onClick={()=>setDraft({...D,[c.key]:D[c.key]+5})} aria-label={'Raise '+c.label}>+</button>
+              </div>
+            </div>
+          );
+        })}
+        <div className="budget">
+          <span className="eyebrow">Allocated</span>
+          <span className="num" style={{fontSize:20,fontWeight:700,color: spent===100?'var(--gold)':'var(--bad)'}}>{spent}</span>
+          <span className="num" style={{color:'var(--chalk-dim)'}}>/100</span>
+          <div style={{marginLeft:'auto',display:'flex',gap:8,flexWrap:'wrap'}}>
+            <button className="btn" onClick={suggest}>Suggest a split</button>
+            <button className="btn" onClick={()=>setDraft({...BASE_W})}>Reset to default</button>
+            <button className="btn gold" onClick={applyWeights} disabled={spent!==100}>Apply to week {nextWeek}</button>
+          </div>
+        </div>
+      </Card>
+
+      <Card title="Sunday message" note="Paste this to your friend">
+        <textarea className="txt" rows="7" readOnly value={
+`Week ${wk} — ${myStats.total}/700 🔥
+Average: ${myStats.avg}/100
+Best day: ${myStats.best}/100
+Workout: ${myStats.workout}/7
+Learning: ${myStats.learning}/7
+Sleep: ${myStats.sleep}/7
+Streak: ${myStats.streak} days
+
+Week ${nextWeek}. Beat it. 😎`}/>
+      </Card>
+    </div>
+  );
+}
+
+function ChallengeView({st}){
+  const days = Array.from({length:30},(_,i)=>addDays(st.start,i));
+  const totals = {a:0,b:0};
+  const cells = days.map((k,i)=>{
+    const W = weightsFor(st, weekOf(k, st.start));
+    const a = score(st.entries.a[k],W), b = score(st.entries.b[k],W);
+    totals.a += a.total; totals.b += b.total;
+    return {k, i, a:a.total, b:b.total, hasA:!!st.entries.a[k], hasB:!!st.entries.b[k]};
+  });
+
+  const Level = ({p, tone}) => {
+    const pts = totals[p];
+    const lv = levelFor(pts);
+    const next = LEVELS[LEVELS.indexOf(lv)+1];
+    const span = next ? next.min - lv.min : 1;
+    const pct = next ? Math.min(100,(pts-lv.min)/span*100) : 100;
+    return (
+      <div className="lvl">
+        <div className="lvl-top">
+          <span className="lvl-name" style={{color:tone}}>{st.names[p]}</span>
+          <span className="lvl-pts">{pts}</span>
+          <span className="lvl-tier">{lv.icon} {lv.name}</span>
+        </div>
+        <div className="lvl-bar"><i style={{width:pct+'%',background:tone}}/></div>
+        <div className="lvl-next">{next ? `${next.min-pts} points to ${next.icon} ${next.name}` : 'Top level reached 👑'}</div>
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      <div style={{padding:'18px 0 20px',borderBottom:'1px solid var(--line)',marginBottom:20}}>
+        <div className="dt" style={{fontFamily:'var(--cond)',fontSize:26,letterSpacing:'.05em',textTransform:'uppercase'}}>
+          The full 30
+          <small style={{display:'block',fontSize:11,letterSpacing:'.2em',color:'var(--chalk-dim)'}}>
+            {pretty(st.start)} — {pretty(addDays(st.start,29))}
+          </small>
+        </div>
+      </div>
+
+      <Card title="Every day on the board" note={<span><span className="a-tx">■</span> {st.names.a} &nbsp; <span className="b-tx">■</span> {st.names.b}</span>}>
+        <div className="dgrid">
+          {cells.map(c=>(
+            <div key={c.k} className={'dcell'+(c.k===TODAY?' today':'')} title={`${pretty(c.k)} — ${st.names.a} ${c.a}, ${st.names.b} ${c.b}`}>
+              <div className="dbars">
+                <div className={'dbar'+(c.hasA?' a':'')} style={{height:Math.max(2,c.a/100*34)+'px'}}/>
+                <div className={'dbar'+(c.hasB?' b':'')} style={{height:Math.max(2,c.b/100*34)+'px'}}/>
+              </div>
+              <div className="dn">{c.i+1}</div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card title="Levels" note="Points across all 30 days">
+        <Level p="a" tone="var(--pa)"/>
+        <Level p="b" tone="var(--pb)"/>
+        <hr className="rule"/>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}}>
+          {LEVELS.map(l=>(
+            <div key={l.name} style={{fontSize:12.5,color:'var(--chalk-dim)'}}>
+              <span style={{fontFamily:'var(--mono)'}}>{l.min}+</span> {l.icon} {l.name}
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function SetupView({st, setSt, me, reload}){
+  const [io, setIo] = useState('');
+  const [msg, setMsg] = useState('');
+
+  const csv = () => {
+    const rows = [['Date','Day','Week','Player','Wakeup','Workout','Work','Personal','Sleep','Total','Activity','Note']];
+    ['a','b'].forEach(p=>{
+      Object.keys(st.entries[p]).sort().forEach(k=>{
+        const wk = weekOf(k, st.start), W = weightsFor(st, wk);
+        const s = score(st.entries[p][k], W), e = st.entries[p][k];
+        rows.push([k, diffDays(k,st.start)+1, wk, st.names[p],
+          s.weighted.wakeup, s.weighted.workout, s.weighted.work, s.weighted.personal, s.weighted.sleep, s.total,
+          (e.workout&&e.workout.activity)||'', (e.note||'').replace(/"/g,"'")]);
+      });
+    });
+    const text = rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text],{type:'text/csv'}));
+    a.download = `project-100-${TODAY}.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setMsg('Downloaded project-100-'+TODAY+'.csv');
+  };
+
+  const exportJson = () => { setIo(JSON.stringify(st)); setMsg('Copy the text below and send it over.'); };
+  const importJson = () => {
+    try{
+      const inc = JSON.parse(io);
+      if(!inc.entries) throw new Error('no entries');
+      setSt(s=>{
+        const merged = {a:{...s.entries.a}, b:{...s.entries.b}};
+        ['a','b'].forEach(p=>{
+          Object.keys(inc.entries[p]||{}).forEach(k=>{
+            // their days overwrite; my own days are never clobbered by an import
+            if(p!==me || !merged[p][k]) merged[p][k] = inc.entries[p][k];
+          });
+        });
+        return {...s, entries:merged, weights:{...inc.weights, ...s.weights}};
+      });
+      setMsg('Merged. Their days are in; yours were left alone.');
+      setIo('');
+    }catch(e){ setMsg('That text is not a valid export. Paste the whole thing, including the braces.'); }
+  };
+
+  return (
+    <div>
+      <div style={{padding:'18px 0 20px',borderBottom:'1px solid var(--line)',marginBottom:20}}>
+        <div style={{fontFamily:'var(--cond)',fontSize:26,letterSpacing:'.05em',textTransform:'uppercase'}}>Setup</div>
+      </div>
+
+      <div className="grid2">
+        <Card title="The two of you">
+          <div className="field">
+            <span className="eyebrow">Player A</span>
+            <input className="txt" value={st.names.a} maxLength="18"
+                   onChange={e=>setSt(s=>({...s,names:{...s.names,a:e.target.value}}))}/>
+          </div>
+          <div className="field">
+            <span className="eyebrow">Player B</span>
+            <input className="txt" value={st.names.b} maxLength="18"
+                   onChange={e=>setSt(s=>({...s,names:{...s.names,b:e.target.value}}))}/>
+          </div>
+          <div className="field">
+            <span className="eyebrow">Day 1 of the challenge</span>
+            <input className="txt" type="date" value={st.start}
+                   onChange={e=>e.target.value && setSt(s=>({...s,start:e.target.value}))}/>
+          </div>
+          <p style={{fontSize:13,color:'var(--chalk-dim)',margin:0}}>
+            Day 1 sets the week boundaries, so change it before you start logging rather than halfway through.
+          </p>
+        </Card>
+
+        <Card title="Sharing scores">
+          <p style={{marginTop:0,fontSize:13.5,color:'var(--chalk-mid)'}}>
+            {hasClaude
+              ? 'Both of you are writing to the same shared record, so scores show up on each other\'s screen without any exporting.'
+              : 'This copy saves to this browser only. To compare, one of you exports and the other pastes it in — Sunday is a good rhythm for that.'}
+          </p>
+          <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:14}}>
+            <button className="btn gold" onClick={csv}>Download scores (CSV)</button>
+            <button className="btn" onClick={exportJson}>Export my data</button>
+            <button className="btn" onClick={importJson} disabled={!io.trim()}>Merge pasted data</button>
+          </div>
+          <textarea className="txt" rows="6" value={io} onChange={e=>{setIo(e.target.value);setMsg('');}}
+                    placeholder="Export drops your data here. Or paste your friend's export and hit merge."/>
+          {msg && <p style={{fontSize:13,color:'var(--gold)',marginBottom:0}}>{msg}</p>}
+        </Card>
+      </div>
+
+      <Card title="Start over">
+        <p style={{marginTop:0,fontSize:13.5,color:'var(--chalk-mid)'}}>
+          Wipes every logged day for both players. Download the CSV first if you want to keep the record.
+        </p>
+        <button className="btn danger" onClick={()=>{
+          if(confirm('Erase all 30 days for both players?')){ reload(freshState()); }
+        }}>Erase everything</button>
+      </Card>
+    </div>
+  );
+}
+
+/* ============================================================
+   App
+   ============================================================ */
+function App(){
+  const [st, setSt] = useState(null);
+  const [me, setMe] = useState('a');
+  const [tab, setTab] = useState('day');
+  const [cursor, setCursor] = useState(TODAY);
+  const [saved, setSaved] = useState(false);
+  const first = useRef(true);
+
+  useEffect(()=>{ (async()=>{
+    const s = await store.get(KEY, true);
+    const m = await store.get(ME, false);
+    setSt(s && s.entries ? {...freshState(), ...s} : freshState());
+    if(m==='a'||m==='b') setMe(m);
+  })(); },[]);
+
+  useEffect(()=>{
+    if(!st) return;
+    if(first.current){ first.current=false; return; }
+    const t = setTimeout(async()=>{
+      await store.set(KEY, st, true);
+      setSaved(true); setTimeout(()=>setSaved(false), 1200);
+    }, 450);
+    return ()=>clearTimeout(t);
+  },[st]);
+
+  const pickMe = p => { setMe(p); store.set(ME, p, false); };
+  const update = useCallback((player, date, entry)=>{
+    setSt(s=>({...s, entries:{...s.entries, [player]:{...s.entries[player], [date]:entry}}}));
+  },[]);
+
+  if(!st) return <div className="wrap" style={{paddingTop:60,color:'var(--chalk-dim)'}}>Loading your scores…</div>;
+
+  const dayNo = diffDays(TODAY, st.start)+1;
+  const TABS = [['day','Today'],['week','Week'],['run','30 Days'],['setup','Setup']];
+
+  return (
+    <>
+      <header className="topbar">
+        <div className="topbar-in">
+          <h1 className="brand">Project <span>100</span></h1>
+          <span className="daychip">{dayNo>=1&&dayNo<=30 ? `Day ${pad(dayNo)} / 30` : (dayNo<1 ? 'Not started' : 'Challenge complete')}</span>
+          <div className="who">
+            <span className="who-label">Logging as</span>
+            <button className={'pill'+(me==='a'?' on-a':'')} onClick={()=>pickMe('a')}>{st.names.a}</button>
+            <button className={'pill'+(me==='b'?' on-b':'')} onClick={()=>pickMe('b')}>{st.names.b}</button>
+          </div>
+        </div>
+        <nav className="tabs">
+          {TABS.map(([k,l])=>(
+            <button key={k} className={'tab'+(tab===k?' on':'')} onClick={()=>setTab(k)}>{l}</button>
+          ))}
+        </nav>
+      </header>
+
+      <main className="wrap">
+        {tab==='day'  && <DayView st={st} me={me} cursor={cursor} setCursor={setCursor} update={update}/>}
+        {tab==='week' && <WeekView st={st} setSt={setSt} me={me}/>}
+        {tab==='run'  && <ChallengeView st={st}/>}
+        {tab==='setup'&& <SetupView st={st} setSt={setSt} me={me} reload={setSt}/>}
+      </main>
+
+      <div className={'saveflag'+(saved?' show':'')}>Saved</div>
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
