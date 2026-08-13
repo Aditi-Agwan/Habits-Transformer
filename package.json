@@ -1,0 +1,23 @@
+{
+  "name": "habits-transformer",
+  "version": "1.0.0",
+  "description": "A **30-day habit tracking and accountability challenge** — score yourself daily across 5 life categories and earn up to 100 points per day. Honest self-assessment over inflated scores: *\"a real 32 beats a fake 72.\"*",
+  "main": "vite.config.js",
+  "scripts": {
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview"
+}
+,
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.5",
+    "vite": "^8.2.1"
+  }
+}
