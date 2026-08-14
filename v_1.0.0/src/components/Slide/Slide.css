@@ -1,0 +1,85 @@
+.slider-row {
+  display: grid;
+  grid-template-columns: 130px 1fr 48px;
+  gap: 13px;
+  align-items: center;
+  padding: 7px 0;
+}
+
+.slider-row label { font-size: 13.5px; color: var(--ink-mid); transition: color .2s; }
+.slider-row:hover label { color: var(--ink); }
+
+.slider-row .v {
+  font-family: var(--mono);
+  font-size: 13px;
+  text-align: right;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.slider-row .v .om { color: var(--ink-dim); font-weight: 500; }
+
+input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 22px;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  --pct: 0%;
+  --tone: var(--gold);
+  --tone2: #ffe08a;
+}
+
+input[type=range].pa { --tone: #EF5B2A; --tone2: #ff9c72; }
+input[type=range].pb { --tone: #22A0CC; --tone2: #6fd2f0; }
+
+input[type=range]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--tone), var(--tone2) var(--pct), rgba(148,178,255,.14) var(--pct));
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.4);
+  transition: box-shadow .3s;
+}
+
+input[type=range]::-moz-range-track {
+  height: 6px;
+  border-radius: 4px;
+  background: rgba(148,178,255,.14);
+}
+
+input[type=range]::-moz-range-progress {
+  height: 6px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--tone), var(--tone2));
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  border: none;
+  cursor: grab;
+  margin-top: -6px;
+  box-shadow: 0 0 0 3px rgba(255,255,255,.15), 0 0 14px var(--tone), 0 2px 6px rgba(0,0,0,.5);
+  transition: transform .2s var(--spring), box-shadow .2s;
+}
+
+input[type=range]:hover::-webkit-slider-thumb  { transform: scale(1.25); }
+input[type=range]:active::-webkit-slider-thumb { transform: scale(1.45); cursor: grabbing; }
+
+input[type=range]::-moz-range-thumb {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  border: none;
+  cursor: grab;
+  box-shadow: 0 0 0 3px rgba(255,255,255,.15), 0 0 14px var(--tone), 0 2px 6px rgba(0,0,0,.5);
+}
+
+@media (max-width: 640px) {
+  .slider-row { grid-template-columns: 104px 1fr 44px; gap: 9px; }
+}

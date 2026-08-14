@@ -1,0 +1,170 @@
+/* ── Per-category court (head-to-head breakdown) ── */
+.court { position: relative; padding: 4px 0; }
+
+.rally {
+  display: grid;
+  grid-template-columns: 1fr 96px 1fr;
+  align-items: center;
+  gap: 2px;
+  padding: 9px 0;
+}
+
+.side {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.side.l { justify-content: flex-end; }
+.side.r { flex-direction: row-reverse; justify-content: flex-end; }
+
+.track {
+  flex: 1;
+  height: 20px;
+  background: rgba(0,0,0,.3);
+  border-radius: 6px;
+  display: flex;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.45);
+}
+
+.side.l .track { justify-content: flex-end; }
+
+.fill {
+  height: 100%;
+  transition: width .7s var(--swift);
+  min-width: 2px;
+  position: relative;
+}
+
+.fill.a { background: linear-gradient(90deg, #b23a14, #EF5B2A); border-radius: 6px 0 0 6px; }
+.fill.b { background: linear-gradient(90deg, #22A0CC, #0e6a8c); border-radius: 0 6px 6px 0; }
+
+.side.l .fill { border-radius: 6px 4px 4px 6px; }
+.side.r .fill { border-radius: 4px 6px 6px 4px; }
+
+.sc {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  width: 34px;
+  flex: none;
+}
+
+.side.l .sc { text-align: left;  color: var(--pa); }
+.side.r .sc { text-align: right; color: var(--pb); }
+
+.mid { text-align: center; padding: 0 6px; }
+
+.mid .n {
+  font-family: var(--disp);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink-mid);
+  display: block;
+}
+
+.mid .cap {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--ink-dim);
+}
+
+/* ── Point breakdown split bar ── */
+.split {
+  display: flex;
+  gap: 3px;
+  margin-top: 9px;
+  height: 10px;
+}
+
+.split .seg {
+  background: rgba(0,0,0,.3);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.split .seg i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  transition: width .7s var(--swift);
+}
+
+/* ── Golden motivational quote bar ── */
+.golden {
+  position: relative;
+  border-radius: 12px;
+  padding: 13px 15px 13px 18px;
+  margin-top: 18px;
+  font-size: 13.5px;
+  color: var(--ink-mid);
+  background: linear-gradient(90deg, rgba(245,196,69,.1), transparent 70%);
+  overflow: hidden;
+}
+
+.golden::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--gold);
+  box-shadow: 0 0 12px var(--gold);
+}
+
+.golden b { color: var(--ink); }
+
+/* ── Point breakdown rows (Player A / B entries) ── */
+.breakdown-row {
+  padding: 10px 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.breakdown-row:first-child { border-top: none; }
+
+.breakdown-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.breakdown-player-name {
+  font-family: var(--disp);
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-size: 12.5px;
+}
+
+.breakdown-total {
+  font-family: var(--mono);
+  margin-left: auto;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.breakdown-total-dim { color: var(--ink-dim); }
+
+.breakdown-not-logged {
+  font-size: 13px;
+  color: var(--ink-dim);
+  margin-top: 4px;
+}
+
+.breakdown-activity {
+  font-size: 13px;
+  color: var(--ink-mid);
+  margin-top: 9px;
+}
+
+.breakdown-note {
+  font-size: 13px;
+  color: var(--ink-mid);
+  margin-top: 4px;
+  font-style: italic;
+}

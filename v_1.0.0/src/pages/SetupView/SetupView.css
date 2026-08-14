@@ -1,0 +1,56 @@
+/* ── Setup form fields ── */
+.field { margin-bottom: 15px; }
+.field .eyebrow { display: block; margin-bottom: 7px; }
+
+/* ── Empty state ── */
+.empty {
+  color: var(--ink-dim);
+  font-size: 14px;
+  padding: 26px 0;
+  text-align: center;
+}
+
+.e-ico {
+  display: block;
+  font-size: 30px;
+  margin-bottom: 8px;
+  animation: float-y 3s ease-in-out infinite;
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-7px); }
+}
+
+/* ── Sharing panel ── */
+.sharing-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.setup-hint {
+  margin-top: 0;
+  font-size: 13px;
+  color: var(--ink-dim);
+}
+
+.sharing-text {
+  margin-top: 0;
+  font-size: 13.5px;
+  color: var(--ink-mid);
+}
+
+.setup-msg { font-size: 13px; color: var(--gold); margin-bottom: 0; }
+
+/* ── Start over section ── */
+.danger-text {
+  margin-top: 0;
+  font-size: 13.5px;
+  color: var(--ink-mid);
+}
+
+/* ── Player label colors ── */
+.label-a { color: var(--pa); }
+.label-b { color: var(--pb); }

@@ -1,0 +1,96 @@
+/* Sky — living animated background */
+.sky {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.sky::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    transparent 0deg,
+    rgba(239, 91, 42, .05) 70deg,
+    transparent 140deg,
+    rgba(34, 160, 204, .05) 220deg,
+    transparent 300deg,
+    rgba(245, 196, 69, .03) 340deg,
+    transparent 360deg
+  );
+  animation: halo 90s linear infinite;
+}
+
+@keyframes halo { to { transform: rotate(1turn); } }
+
+.sky::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, rgba(148,178,255,.07) 0 1px, transparent 1px 110px),
+    repeating-linear-gradient(0deg,  rgba(148,178,255,.07) 0 1px, transparent 1px 110px);
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 0%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 0%, transparent 75%);
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: .5;
+  will-change: transform;
+}
+
+.orb.a {
+  width: 56vmax; height: 56vmax;
+  left: -18vmax; top: -24vmax;
+  background: radial-gradient(circle at 35% 35%, rgba(239,91,42,.5), rgba(239,91,42,.12) 45%, transparent 70%);
+  animation: drift-a 26s ease-in-out infinite alternate;
+}
+
+.orb.b {
+  width: 52vmax; height: 52vmax;
+  right: -16vmax; bottom: -22vmax;
+  background: radial-gradient(circle at 60% 60%, rgba(34,160,204,.5), rgba(34,160,204,.12) 45%, transparent 70%);
+  animation: drift-b 32s ease-in-out infinite alternate;
+}
+
+.orb.g {
+  width: 34vmax; height: 34vmax;
+  left: 52%; top: 38%;
+  opacity: .22;
+  background: radial-gradient(circle, rgba(245,196,69,.45), transparent 65%);
+  animation: drift-g 40s ease-in-out infinite alternate;
+}
+
+@keyframes drift-a {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(9vmax, 7vmax) scale(1.15); }
+}
+
+@keyframes drift-b {
+  from { transform: translate(0, 0) scale(1.1); }
+  to   { transform: translate(-8vmax, -6vmax) scale(.95); }
+}
+
+@keyframes drift-g {
+  from { transform: translate(-4vmax, 2vmax); }
+  to   { transform: translate(5vmax, -4vmax); }
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  animation: twinkle var(--tw, 4s) ease-in-out infinite alternate;
+  will-change: opacity;
+}
+
+@keyframes twinkle {
+  from { opacity: .05; }
+  to   { opacity: var(--maxo, .7); }
+}

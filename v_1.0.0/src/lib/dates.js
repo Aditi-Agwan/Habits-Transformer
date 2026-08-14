@@ -1,0 +1,11 @@
+export const pad = n => String(n).padStart(2, '0');
+export const toKey = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+export const fromKey = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+export const addDays = (k, n) => { const d = fromKey(k); d.setDate(d.getDate() + n); return toKey(d); };
+export const diffDays = (a, b) => Math.round((fromKey(a) - fromKey(b)) / 86400000);
+export const TODAY = toKey(new Date());
+export const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+export const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+export const pretty = k => { const d = fromKey(k); return `${DOW[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}`; };
+export const weekOf = (k, start) => Math.floor(Math.max(0, diffDays(k, start)) / 7) + 1;
+export const weekDates = (w, start) => Array.from({ length: 7 }, (_, i) => addDays(start, (w - 1) * 7 + i));

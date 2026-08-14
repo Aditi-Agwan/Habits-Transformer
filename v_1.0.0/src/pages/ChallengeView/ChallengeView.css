@@ -1,0 +1,181 @@
+/* ── 30-day cell grid ── */
+.dgrid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 760px) { .dgrid { grid-template-columns: repeat(6, 1fr); } }
+@media (max-width: 480px) { .dgrid { grid-template-columns: repeat(5, 1fr); } }
+
+.dcell {
+  position: relative;
+  background: rgba(7, 11, 20, .45);
+  border: 1px solid var(--line-soft);
+  border-radius: 11px;
+  padding: 8px 5px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  animation: cell-in .55s var(--swift) both;
+  animation-delay: var(--d, 0ms);
+  transition: transform .25s var(--spring), border-color .25s, box-shadow .25s, background .25s;
+}
+
+@keyframes cell-in {
+  from { opacity: 0; transform: scale(.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.dcell:hover {
+  transform: translateY(-4px) scale(1.06);
+  border-color: var(--glass-brd2);
+  background: rgba(16, 25, 44, .8);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, .45);
+  z-index: 5;
+}
+
+.dcell.today {
+  border-color: rgba(245, 196, 69, .6);
+  box-shadow: 0 0 0 1px rgba(245,196,69,.3), 0 0 18px rgba(245,196,69,.15);
+}
+
+.dcell.today::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 11px;
+  pointer-events: none;
+  border: 1px solid rgba(245,196,69,.5);
+  animation: today-ring 2.2s ease-out infinite;
+}
+
+@keyframes today-ring {
+  0%   { transform: scale(1);    opacity: .8; }
+  100% { transform: scale(1.28); opacity: 0; }
+}
+
+.dcell .dn {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink-dim);
+  text-align: center;
+}
+
+.dcell.today .dn { color: var(--gold); }
+
+/* ── Mini bars inside each cell ── */
+.dbars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  height: 38px;
+}
+
+.dbar {
+  width: 9px;
+  border-radius: 3px 3px 1px 1px;
+  background: rgba(148, 178, 255, .07);
+  min-height: 2px;
+  transition: height .5s var(--swift);
+}
+
+.dbar.a { background: linear-gradient(180deg, var(--pa), var(--pa-mark)); box-shadow: 0 0 6px rgba(239,91,42,.3); }
+.dbar.b { background: linear-gradient(180deg, var(--pb), var(--pb-mark)); box-shadow: 0 0 6px rgba(34,160,204,.3); }
+
+/* ── Level bars ── */
+.lvl {
+  padding: 16px 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.lvl:first-of-type { border-top: none; padding-top: 0; }
+
+.lvl-top {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.lvl-name {
+  font-family: var(--disp);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.lvl-tier { font-size: 13px; color: var(--ink-mid); margin-left: auto; }
+
+.lvl-pts  { font-family: var(--mono); font-size: 20px; font-weight: 800; }
+
+.lvl-bar {
+  position: relative;
+  height: 12px;
+  background: rgba(0, 0, 0, .32);
+  border-radius: 7px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, .45);
+}
+
+.lvl-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 7px;
+  transition: width .9s var(--swift);
+  position: relative;
+  overflow: hidden;
+}
+
+.lvl-bar i::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 25%, rgba(255,255,255,.35) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: tug-shimmer 2.4s linear infinite;
+}
+
+.lvl-next { font-size: 12px; color: var(--ink-dim); margin-top: 7px; }
+
+.lvl-marks { position: absolute; inset: 0; pointer-events: none; }
+.lvl-marks i { position: absolute; top: 0; bottom: 0; width: 2px; background: rgba(7, 11, 20, .6); }
+
+/* ── Level ladder reference ── */
+.lvl-ladder {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 560px) { .lvl-ladder { grid-template-columns: repeat(2, 1fr); } }
+
+.lvl-ladder .li {
+  font-size: 12.5px;
+  color: var(--ink-dim);
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition: all .25s;
+}
+
+.lvl-ladder .li:hover { border-color: var(--line); color: var(--ink-mid); transform: translateY(-2px); }
+.lvl-ladder .li .m   { font-family: var(--mono); font-weight: 700; }
+
+/* ── Combined points ── */
+.combined-pts {
+  font-family: var(--mono);
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1.05;
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(245,196,69,.4);
+}
+
+/* ── Rule separator ── */
+.rule { border: none; border-top: 1px solid var(--line); margin: 20px 0; }

@@ -1,0 +1,48 @@
+.ring-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.ring-wrap svg { transform: rotate(-90deg); overflow: visible; }
+
+.ring-track { fill: none; stroke: rgba(148,178,255,.1); stroke-width: 7; }
+
+.ring-val {
+  fill: none;
+  stroke-width: 7;
+  stroke-linecap: round;
+  transition: stroke-dashoffset .9s var(--swift), stroke .4s, filter .4s;
+}
+
+.ring-center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.ring-center .rv {
+  font-family: var(--mono);
+  font-weight: 800;
+  font-size: 26px;
+  line-height: 1;
+}
+
+.ring-center .rl {
+  font-size: 8.5px;
+  letter-spacing: .22em;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.ring-pulse { animation: ring-pulse .5s var(--spring); }
+
+@keyframes ring-pulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.09); }
+  100% { transform: scale(1); }
+}

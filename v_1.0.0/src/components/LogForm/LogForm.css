@@ -1,0 +1,187 @@
+/* ── Category block ── */
+.cat {
+  border-top: 1px solid var(--line-soft);
+  padding: 17px 0;
+  position: relative;
+}
+
+.cat:first-of-type { border-top: none; padding-top: 0; }
+
+.cat-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.cat-ico {
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  flex: none;
+  background: rgba(148,178,255,.07);
+  border: 1px solid var(--line-soft);
+  transition: transform .3s var(--spring), box-shadow .3s, border-color .3s;
+}
+
+.cat:hover .cat-ico { transform: translateY(-2px) rotate(-6deg) scale(1.08); }
+
+.cat.maxed .cat-ico {
+  border-color: rgba(245,196,69,.5);
+  box-shadow: 0 0 14px rgba(245,196,69,.3);
+  animation: maxed-bounce .5s var(--spring);
+}
+
+@keyframes maxed-bounce {
+  0%   { transform: scale(.7) rotate(-15deg); }
+  60%  { transform: scale(1.2) rotate(6deg); }
+  100% { transform: scale(1); }
+}
+
+.cat-name {
+  font-family: var(--disp);
+  font-size: 13px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.cat-pts {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 13.5px;
+  color: var(--ink-dim);
+  font-weight: 500;
+}
+
+.cat-pts b { color: var(--ink); font-weight: 800; font-size: 15px; }
+.cat-pts.full b { color: var(--gold); text-shadow: 0 0 12px rgba(245,196,69,.5); }
+
+.wt-flag {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 99px;
+  border: 1px solid rgba(245,196,69,.45);
+  color: var(--gold);
+  background: rgba(245,196,69,.08);
+}
+
+.cat-meter {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 2px;
+  background: transparent;
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.cat-meter i {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--tone, var(--gold)));
+  opacity: .55;
+  transition: width .6s var(--swift);
+}
+
+/* ── Workout tier buttons ── */
+.tiers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+
+.tier {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 8px 13px;
+  font-size: 12.5px;
+  color: var(--ink-mid);
+  line-height: 1.25;
+  text-align: center;
+  background: rgba(255,255,255,.02);
+  overflow: hidden;
+  transition: transform .25s var(--spring), border-color .25s, color .25s, box-shadow .25s;
+}
+
+.tier b {
+  display: block;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink-dim);
+  transition: color .25s;
+}
+
+.tier:hover {
+  border-color: var(--glass-brd2);
+  color: var(--ink);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(0,0,0,.35);
+}
+
+.tier:active { transform: scale(.92); }
+
+.tier.on {
+  background: linear-gradient(150deg, rgba(245,196,69,.16), rgba(245,196,69,.05));
+  border-color: var(--gold);
+  color: var(--ink);
+  box-shadow: 0 0 16px rgba(245,196,69,.25), inset 0 0 12px rgba(245,196,69,.06);
+  animation: tier-land .4s var(--spring);
+}
+
+@keyframes tier-land {
+  0%   { transform: scale(.85); }
+  60%  { transform: scale(1.07); }
+  100% { transform: scale(1); }
+}
+
+.tier.on b { color: var(--gold); }
+
+.tier.on::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -80%;
+  width: 60%; height: 100%;
+  background: linear-gradient(105deg, transparent, rgba(255,255,255,.18), transparent);
+  animation: shine 2.6s ease-in-out infinite;
+}
+
+/* ── Text input ── */
+.txt {
+  width: 100%;
+  background: rgba(7,11,20,.55);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 11px 13px;
+  font-size: 14px;
+  color: var(--ink);
+  transition: border-color .25s, box-shadow .25s, background .25s;
+}
+
+.txt::placeholder { color: var(--ink-dim); }
+
+.txt:focus {
+  border-color: rgba(245,196,69,.55);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(245,196,69,.12);
+  background: rgba(7,11,20,.75);
+}
+
+textarea.txt {
+  resize: vertical;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* ── Note-to-self label ── */
+.note-label {
+  display: block;
+  margin-bottom: 6px;
+}
