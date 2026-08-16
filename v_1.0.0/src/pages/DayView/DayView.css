@@ -58,3 +58,14 @@
   0%, 100% { transform: translateY(0); }
   50%       { transform: translateY(-7px); }
 }
+
+/* ── Lock panel shown in place of the log form ── */
+.lockpanel { text-align: center; padding: 34px 12px 30px; }
+.lockpanel .big {
+  font-size: 46px;
+  display: block;
+  margin-bottom: 12px;
+  animation: float-y 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 18px rgba(245, 196, 69, .35));
+}
+.lockpanel p { color: var(--ink-mid); font-size: 14px; margin: 0 0 16px; line-height: 1.6; }

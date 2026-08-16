@@ -11,7 +11,7 @@ import { Court, BreakdownRow } from '../../components/Court/Court.jsx';
 import LogForm               from '../../components/LogForm/LogForm.jsx';
 import './DayView.css';
 
-export default function DayView({ st, me, cursor, setCursor, update }) {
+export default function DayView({ st, me, cursor, setCursor, update, lockedMe, requestUnlock }) {
   const wk    = weekOf(cursor, st.start);
   const W     = weightsFor(st, wk);
   const eA    = st.entries.a[cursor];
@@ -60,7 +60,15 @@ export default function DayView({ st, me, cursor, setCursor, update }) {
 
       <div className="grid2">
         <Card title={`${st.names[me]} — log the day`} delay={90} note={<span>Week {wk} weights<br />Scores save as you type</span>}>
-          <LogForm entry={me === 'a' ? eA : eB} weights={W} tone={me === 'a' ? 'pa' : 'pb'} onChange={change} />
+          {lockedMe
+            ? (
+              <div className="lockpanel">
+                <span className="big" aria-hidden="true">🔒</span>
+                <p><b>{st.names[me]}</b>'s scorecard is PIN-locked.<br />Only they can put points on this board.</p>
+                <button className="btn gold" onClick={requestUnlock}>Unlock to log</button>
+              </div>
+            )
+            : <LogForm entry={me === 'a' ? eA : eB} weights={W} tone={me === 'a' ? 'pa' : 'pb'} onChange={change} />}
         </Card>
 
         <div>
