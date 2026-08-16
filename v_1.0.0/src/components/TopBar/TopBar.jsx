@@ -3,7 +3,7 @@ import { pad } from '../../lib/dates.js';
 import { TABS } from '../../lib/constants.js';
 import './TopBar.css';
 
-export default function TopBar({ names, dayNo, myStreak, me, tab, onPickMe, onGoTab }) {
+export default function TopBar({ names, dayNo, myStreak, me, tab, onPickMe, onGoTab, isLocked }) {
   const tabRefs = useRef({});
   const tabsRef = useRef(null);
   const [ink, setInk] = useState({ left: 0, width: 0 });
@@ -46,9 +46,11 @@ export default function TopBar({ names, dayNo, myStreak, me, tab, onPickMe, onGo
           <div className="pillbox">
             <button className={`pill${me === 'a' ? ' on-a' : ''}`} onClick={() => onPickMe('a')}>
               {names.a}
+              {isLocked && isLocked('a') && <span className="pill-lock" aria-label="locked">🔒</span>}
             </button>
             <button className={`pill${me === 'b' ? ' on-b' : ''}`} onClick={() => onPickMe('b')}>
               {names.b}
+              {isLocked && isLocked('b') && <span className="pill-lock" aria-label="locked">🔒</span>}
             </button>
           </div>
         </div>

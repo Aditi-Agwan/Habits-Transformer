@@ -54,3 +54,20 @@
 /* ── Player label colors ── */
 .label-a { color: var(--pa); }
 .label-b { color: var(--pb); }
+
+/* ── Player locks card ── */
+.lockrow {
+  display: flex; align-items: center; gap: 11px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line-soft);
+  flex-wrap: wrap;
+}
+.lockrow:first-of-type { border-top: none; padding-top: 0; }
+.lockrow .ln {
+  font-family: var(--disp); font-weight: 800; font-size: 13px;
+  letter-spacing: .13em; text-transform: uppercase;
+  min-width: 90px;
+}
+.lockrow .lstat  { font-size: 12px; color: var(--ink-dim); margin-right: auto; }
+.lockrow .lstat.on { color: var(--gold); }
+.locks-text { margin-top: 0; font-size: 13.5px; color: var(--ink-mid); }

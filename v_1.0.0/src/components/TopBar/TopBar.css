@@ -286,3 +286,17 @@
   .tab.on     { background: rgba(245,196,69,.1); }
   .tab-ink    { display: none; }
 }
+
+/* ── PIN lock badge on the player pills ── */
+.pill-lock {
+  font-size: 10px;
+  margin-left: 6px;
+  display: inline-block;
+  animation: lock-wiggle 2.6s ease-in-out infinite;
+}
+@keyframes lock-wiggle {
+  0%, 86%, 100% { transform: rotate(0); }
+  90% { transform: rotate(-12deg); }
+  94% { transform: rotate(10deg); }
+  98% { transform: rotate(-5deg); }
+}
