@@ -175,6 +175,9 @@ export default function App() {
           <span className="level-emoji">{levelFor(derived.grand).emoji}</span>
           <span>{levelFor(derived.grand).name}</span>
         </div>
+        <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
+          <a href="alternate/index.html" className="ghost" style={{textDecoration: 'none', padding: '6px 10px'}}>Two-player</a>
+        </div>
       </header>
 
       <nav className="tabs" role="tablist">
