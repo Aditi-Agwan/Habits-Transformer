@@ -1,0 +1,78 @@
+/* ── PIN modal — veil, card, lock icon, inputs ── */
+.veil {
+  position: fixed; inset: 0; z-index: 170;
+  display: grid; place-items: center; padding: 20px;
+  background: rgba(4, 7, 14, .62);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  animation: veil-in .25s ease both;
+}
+@keyframes veil-in { from { opacity: 0; } to { opacity: 1; } }
+
+.modal {
+  width: min(370px, 100%);
+  background: var(--panel-2);
+  border: 1px solid var(--glass-brd2);
+  border-radius: 22px;
+  padding: 28px 26px 24px;
+  text-align: center;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .06);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  animation: modal-pop .45s var(--spring) both;
+}
+@keyframes modal-pop {
+  from { opacity: 0; transform: scale(.8) translateY(26px); }
+  to   { opacity: 1; transform: none; }
+}
+.modal.shake { animation: mshake .5s ease; }
+@keyframes mshake {
+  0%, 100% { transform: translateX(0); }
+  12% { transform: translateX(-12px); }
+  28% { transform: translateX(10px); }
+  44% { transform: translateX(-8px); }
+  60% { transform: translateX(6px); }
+  76% { transform: translateX(-4px); }
+  90% { transform: translateX(2px); }
+}
+
+.lock-ico {
+  width: 60px; height: 60px; margin: 0 auto 14px;
+  border-radius: 19px; display: grid; place-items: center; font-size: 27px;
+  background: rgba(245, 196, 69, .1);
+  border: 1px solid rgba(245, 196, 69, .35);
+  box-shadow: 0 0 24px rgba(245, 196, 69, .18);
+  animation: lock-float 3s ease-in-out infinite;
+}
+@keyframes lock-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+.lock-ico.open { animation: lock-open .6s var(--spring) both; }
+@keyframes lock-open {
+  0%   { transform: scale(1) rotate(0); }
+  40%  { transform: scale(1.25) rotate(-10deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+.modal h3 {
+  font-family: var(--disp); font-size: 16px; font-weight: 800;
+  letter-spacing: .14em; text-transform: uppercase; margin: 0 0 6px;
+}
+.modal .m-sub { font-size: 13px; color: var(--ink-mid); margin: 0 0 16px; line-height: 1.5; }
+
+.pin {
+  width: 100%; text-align: center;
+  font-family: var(--mono); font-size: 21px; font-weight: 700; letter-spacing: .35em;
+  background: rgba(7, 11, 20, .6);
+  border: 1px solid var(--line); border-radius: 13px;
+  padding: 12px 10px 12px 14px;
+  color: var(--ink); margin-bottom: 9px;
+  transition: border-color .25s, box-shadow .25s;
+}
+.pin::placeholder { letter-spacing: .12em; font-size: 13px; font-weight: 500; color: var(--ink-dim); }
+.pin:focus {
+  border-color: rgba(245, 196, 69, .55); outline: none;
+  box-shadow: 0 0 0 3px rgba(245, 196, 69, .12);
+}
+
+.m-err { color: var(--bad); font-size: 12.5px; font-weight: 600; min-height: 19px; margin: 4px 0 0; }
+.m-btns { display: flex; gap: 9px; margin-top: 14px; justify-content: center; flex-wrap: wrap; }
