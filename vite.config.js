@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   // Use a relative base so links and assets resolve both locally and on GitHub Pages.
-  base: './',
+  base: '/Habits-Transformer/',
   plugins: [react()],
   build: {
     rollupOptions: {
